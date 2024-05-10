@@ -5,10 +5,10 @@ Making a full project that interacts with google calendar api's to "Crud" events
 **Below are instruction on how to follow along** 
 
 * first you want to fork the repo 
-    * click on code ![alt text](<Screenshot 2024-05-10 at 9.08.14 AM.png>)
+    * click on code ![alt text](<images_for_readme/github_code_clone_button.png>)
 
     * then click on ssh and copy the code 
-    ![alt text](<Screenshot 2024-05-10 at 9.07.28 AM.png>)
+    ![alt text](<images_for_readme/github_cloneurl.png>)
 
 
 * You should have some type of url copied 
