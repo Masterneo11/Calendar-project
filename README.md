@@ -4,9 +4,7 @@ Making a full project that interacts with google calendar api's to "Crud" events
 
 **Below are instruction on how to follow along** 
 
-* first you want to fork the repo 
-    * click on code ![alt text](<images_for_readme/github_code_clone_button.png>)
-
+* first you want to clone the repo
     * then click on ssh and copy the code 
     ![alt text](<images_for_readme/github_cloneurl.png>)
 
@@ -14,13 +12,18 @@ Making a full project that interacts with google calendar api's to "Crud" events
 * You should have some type of url copied 
 **Next**
 * Go to you terminal and enter this command where you want to have the files exist 
-```Python
+```bash
 git clone git@github.com:Masterneo11/Calendar-project.git
 ```
 
 * Go to the backend file and run this command in your terminal 
-
-```Python
+* Create a virutual environment
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+ * Now install dependencies
+```bash
 pip install -r requirements.txt
 ```
 ## **Installing google calendar Api**
@@ -52,11 +55,11 @@ alembic upgrade head
 * If your using VsCode you can go to the debugger run and debug and use fast api 
 
 * If your  using the terminal bash 
-```Python
+```bash
 uvicorn app.main:app
 ```
 bash 
-```Python
+```bash
 uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 * Go to google or safari and type in this url
