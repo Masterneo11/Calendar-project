@@ -42,17 +42,10 @@ follow the link to use the same one
     
 * in pgadmin you'll want to create a server if you don't already have one and in their create a database, I named mine schedueling to keep it simple. 
 
-# alembic 
+### alembic 
 
-* technically speaking everything in alembic should be the same. If not then follow these commands 
-
-create the first .ini
-``` Python
-alembic init alembic
-```
-next bash 
-```Python
-alembic -m revisions -m " create_table_"
+```bash
+alembic upgrade head
 ```
 ## Starting localhost
 
