@@ -1,0 +1,14 @@
+
+
+fastapi
+uvicorn
+sqlmodel
+psycopg2
+python-decouple 
+alembic
+
+PyJWT
+
+google-api-python-client
+google-auth-httplib2 
+google-auth-oauthlib
