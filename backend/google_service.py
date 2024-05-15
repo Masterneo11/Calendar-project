@@ -3,7 +3,6 @@ import base64
 import datetime
 import json
 import os.path
-from typing import Tuple
 from schemas import CalendarEvent, Create_Calendar_Event
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -14,7 +13,6 @@ import googleapiclient.discovery
 from google.oauth2 import service_account
 
 
-from google.auth import jwt
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 
@@ -70,13 +68,13 @@ def initialize_calendar_client():
 def get_events(service):
   # Call the Calendar API
   now = datetime.datetime.now(datetime.UTC).isoformat()
-  print("Getting the upcoming 10 events")
+  print("Getting the upcoming 100 events")
   events_result = (
       service.events()
       .list(
           calendarId="primary",
           timeMin=now,
-          maxResults=10,
+          maxResults=100,
           singleEvents=True,
           orderBy="startTime",
       )
@@ -94,19 +92,22 @@ def get_events(service):
     summary = event["summary"]
     description = event.get("description", None)
     id = event["id"]
-    attendees = event["attendees"]
-    location = event["location"]
+    # location = event["location"]
     status = event["status"]
+    location = event.get("location", None) 
+    attendees = [attendee["email"] for attendee in event.get("attendees", [])]  # Extract email addresses
 
+    
 
     calendar_events.append(CalendarEvent(start=start,
-                                         end=end,
-                                         summary=summary,
-                                         description=description ,
-                                         id=id,
-                                        #  attendees=attendees,
-                                         location=location,
-                                         status=status,
+                                        end=end,
+                                        summary=summary,
+                                        description=description ,
+                                        id=id,
+                                        location=location,
+                                        status=status,
+                                        attendees=attendees
+                                        
 
                                          ))
   return calendar_events
@@ -121,9 +122,9 @@ def convert_to_iso_date_time(date_str: str, time_str: str, tz: str = "America/De
 
 
 def create_event(service, event: Create_Calendar_Event):
-    # Convert date and time to ISO 8601 format
-    start_datetime = str(event.start.astimezone())
-    end_datetime = str(event.end.astimezone())
+    # # Convert date and time to ISO 8601 format
+    # start_datetime = str(event.start.astimezone())
+    # end_datetime = str(event.end.astimezone())
     event_body = {
         'summary': event.summary,
         'location': event.location, 
@@ -143,13 +144,15 @@ def create_event(service, event: Create_Calendar_Event):
                   {'method': 'email', 'minutes': 24 * 60},
                   {'method': 'popup', 'minutes': 10},
 
-              ] if event.reminders else [],
+              ] 
+            #   if event.reminders else [],
           },
           
     }
-    
-
-    event = service.events().insert(calendarId='primary', body=event_body).execute()
+    try:
+        event = service.events().insert(calendarId='primary', body=event_body).execute()
+    except Exception as e:
+        print("something")
     print('Event created: %s' % (event.get('htmlLink')))
     event_id = event['id']
     print('Event created with ID: %s' % event_id)
@@ -160,14 +163,16 @@ def delete_event(service, event_id: str):
         service.events().delete(calendarId='primary', eventId=event_id).execute()
         print(f"Event with ID {event_id} deleted successfully.")
     
-      
-def update_event(service, event_id:str, event: CalendarEvent ):
-  #  service = get_google_service()
-   
-   event_body = {
+
+
+def update_event(service, event_id: str, event: Create_Calendar_Event):
+    # # Convert date and time to ISO 8601 format
+    # start_datetime = str(event.start.astimezone())
+    # end_datetime = str(event.end.astimezone())
+    event_body = {
         'summary': event.summary,
         'location': event.location, 
-        'description': event.description,
+         'description': event.description,
         'start': {
             'dateTime': event.start.isoformat(),
             'timeZone': 'America/Denver',  # You can change the timeZone as needed
@@ -176,18 +181,20 @@ def update_event(service, event_id:str, event: CalendarEvent ):
             'dateTime': event.end.isoformat(),
             'timeZone': 'America/Denver',
         },
-         'attendees': [{'email': event.attendees}],
+         'attendees': [{'email': event.attendees},{'email': event.attendees}],
           'reminders': {
               'useDefault': False,
               'overrides': [
                   {'method': 'email', 'minutes': 24 * 60},
                   {'method': 'popup', 'minutes': 10},
-              ]if event.reminders else [],
-          },'eventId': 'summary'} 
-   event = service.events().update(id=id, body=event_body).execute()
-   service.events().update( body=event_body).execute()
-   service.events().update(calendarId='primary', eventId=event_id).ececute()
 
+            ]#   ] if event.reminders else [],
+          }
+    }
+    
+    event = service.events().update(calendarId='primary',eventId=event_id, body=event_body).execute()
+
+    
 
 def filter_events(events: list[CalendarEvent]) -> list[CalendarEvent]:
     filtered_events = []
@@ -198,6 +205,23 @@ def filter_events(events: list[CalendarEvent]) -> list[CalendarEvent]:
         if start_day_of_week in [4, 5]:
             filtered_events.append(event)
     return filtered_events
+
+def get_list_of_calendars(service):
+
+    calendars_result = service.calendarList().list().execute()
+    calendars = calendars_result.get('items', [])
+
+    if not calendars:
+        print("No calendars found.")
+        return []
+
+    calendar_list = []
+    for calendar in calendars:
+        summary = calendar.get('summary', '')
+        id = calendar.get('id', '')
+        calendar_list.append({'summary': summary, 'id': id})
+
+    return calendar_list
 
 
 

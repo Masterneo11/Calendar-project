@@ -1,13 +1,16 @@
-
-
+alembic
 fastapi
-uvicorn
-sqlmodel
+httpx
 psycopg2
 python-decouple 
-alembic
-
 PyJWT
+psycopg2
+pytest
+pytest-spec
+uvicorn
+sqlmodel
+
+pytest-mock
 
 google-api-python-client
 google-auth-httplib2 
