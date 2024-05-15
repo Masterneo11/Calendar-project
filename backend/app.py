@@ -31,7 +31,7 @@ async def create_event(event: Create_Calendar_Event, db: Session = Depends(get_d
         event.eventId = event_id
         return event
     except Exception as e:
-         raise HTTPException(status_code=500, detail="Most likely an issue w/ : date-times format or an email for attendees section")
+         raise HTTPException(status_code=404, detail="Most likely an issue w/ : date-times format or an email for attendees section")
         
 
 @app.delete("/events/{event_id}")
@@ -42,7 +42,7 @@ async def delete_calendar_event(event_id: str):
         google_service.delete_event(service, event_id)
         return {"message": f"Event with ID {event_id} deleted successfully."}
     except HttpError as error:
-        raise HTTPException(status_code=500, detail=f"An error occurred while deleting the event: {error}")
+        raise HTTPException(status_code=400, detail=f"An error occurred while deleting the event: {error}")
 
 @app.put("/events/{event_id}")
 async def update_event_endpoint(event_id: str, event: CalendarEvent):
@@ -51,7 +51,7 @@ async def update_event_endpoint(event_id: str, event: CalendarEvent):
         google_service.update_event(service, event_id, event)
         return {"message": "Event updated successfully"}
    except HttpError as error:
-      return { "error": f"An error occured: {error} "}
+      raise HTTPException(status_code=400, detail=f' That user id might already be deleted try another one{error}')
    
 @app.get("/calendars")
 async def get_list_calendars():
@@ -79,7 +79,7 @@ async def create_user(users: Users, db: Session = Depends(get_db)):
         db.commit()
         return {"message": "user was succesfully Created"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail='maybe delte the pk column and try again')
+        raise HTTPException(status_code=400, detail=f'{e}maybe delte the pk column and try again')
     
 @app.get("/users")
 async def get_users(db: Session = Depends(get_db)) -> list[Users]:
@@ -102,7 +102,7 @@ async def update_users(user_id: int, users: Users, db: Session = Depends(get_db)
             db.commit()
             return {"message": "New user created successfully"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        raise HTTPException(status_code=400, detail=" try another user id ")
 
 
 @app.delete("/users/{user_id}")
@@ -115,5 +115,5 @@ async def delete_users(user_id: int, db: Session = Depends(get_db)):
         db.commit()
         return {"message": "User was deleted succesfully"}    
     except Exception as e:
-        raise HTTPException(status_code=500, detail="That user id might not exist try another one")
+        raise HTTPException(status_code=400, detail=f"{e}That user id might not exist try another one")
 
